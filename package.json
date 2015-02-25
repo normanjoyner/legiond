@@ -1,6 +1,6 @@
 {
   "name": "legiond",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A secure distributed event layer for nodejs applications",
   "main": "application.js",
   "scripts": {
