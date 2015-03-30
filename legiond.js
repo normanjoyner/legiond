@@ -55,8 +55,13 @@ function LegionD(options){
     });
 
     this.network.on("message", function(msg){
-        if(_.has(self.events, msg.event))
-            self.events[msg.event](msg.data);
+        if(_.has(self.events, msg.event)){
+            var json = {
+                author: self.libraries.nodes.list[msg.id],
+                data: msg.data
+            }
+            self.events[msg.event](json);
+        }
     });
 
     this.network.on("error", function(err){
@@ -100,7 +105,7 @@ LegionD.prototype.leave = function(event){
         delete this.events[event];
 }
 
-LegionD.prototype.send = function(event, data, targets, fn){
+LegionD.prototype.send = function(json, targets, fn){
     if(_.isFunction(targets)){
         fn = targets;
         targets = _.values(this.libraries.nodes.list);
@@ -110,7 +115,7 @@ LegionD.prototype.send = function(event, data, targets, fn){
     else if(!_.isArray(targets))
         var targets = [targets];
 
-    this.network.send(event, data || {}, targets, fn);
+    this.network.send(json, targets, fn);
 }
 
 LegionD.prototype.clean_data = function(data){
@@ -128,7 +133,10 @@ LegionD.prototype.set_attributes = function(attributes){
     attributes = _.omit(attributes, ["id", "host_name", "address", "port"]);
     _.defaults(attributes, this.libraries.node.attributes);
     this.libraries.node.attributes = attributes;
-    this.send("legiond.node_updated", attributes);
+    this.send({
+        event: "legiond.node_updated",
+        data: attributes
+    });
 }
 
 LegionD.prototype.exit = function(fn){
