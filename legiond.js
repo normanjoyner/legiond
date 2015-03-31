@@ -58,7 +58,8 @@ function LegionD(options){
         if(_.has(self.events, msg.event)){
             var json = {
                 author: self.libraries.nodes.list[msg.id],
-                data: msg.data
+                data: msg.data,
+                stream: msg.stream
             }
             self.events[msg.event](json);
         }
@@ -114,6 +115,9 @@ LegionD.prototype.send = function(json, targets, fn){
         targets = _.values(this.libraries.nodes.list);
     else if(!_.isArray(targets))
         var targets = [targets];
+
+    if(_.isUndefined(json.data))
+        json.data = {};
 
     this.network.send(json, targets, fn);
 }
