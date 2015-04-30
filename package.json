@@ -18,7 +18,7 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git://github.com/growbrosops/legiond.git"
+    "url": "git://github.com/containership/legiond.git"
   },
   "keywords": [
     "legiond",
@@ -32,7 +32,7 @@
   ],
   "license": "GPLv2",
   "bugs": {
-    "url": "https://github.com/growbrosops/legiond/issues"
+    "url": "https://github.com/containership/legiond/issues"
   },
-  "homepage": "https://github.com/growbrosops/legiond"
+  "homepage": "https://github.com/containership/legiond"
 }
