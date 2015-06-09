@@ -12,10 +12,37 @@
       "from": "https://registry.npmjs.org/eventemitter2/-/eventemitter2-0.4.14.tgz",
       "resolved": "https://registry.npmjs.org/eventemitter2/-/eventemitter2-0.4.14.tgz"
     },
+    "json-stream2": {
+      "version": "0.0.3",
+      "from": "json-stream2@",
+      "resolved": "https://registry.npmjs.org/json-stream2/-/json-stream2-0.0.3.tgz",
+      "dependencies": {
+        "bun": {
+          "version": "0.0.10",
+          "from": "bun@0.0.10",
+          "resolved": "https://registry.npmjs.org/bun/-/bun-0.0.10.tgz"
+        },
+        "tstream": {
+          "version": "0.0.1",
+          "from": "tstream@git://github.com/jasonkuhrt/tstream",
+          "resolved": "git://github.com/jasonkuhrt/tstream#4f51e59ab9bb168e43f724df8b5d027235a6def4"
+        },
+        "delimit-stream": {
+          "version": "0.0.1",
+          "from": "delimit-stream@0.0.1",
+          "resolved": "https://registry.npmjs.org/delimit-stream/-/delimit-stream-0.0.1.tgz"
+        }
+      }
+    },
     "lodash": {
       "version": "2.4.1",
       "from": "https://registry.npmjs.org/lodash/-/lodash-2.4.1.tgz",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-2.4.1.tgz"
+    },
+    "memorystream": {
+      "version": "0.3.1",
+      "from": "memorystream@",
+      "resolved": "https://registry.npmjs.org/memorystream/-/memorystream-0.3.1.tgz"
     },
     "netmask": {
       "version": "1.0.5",
