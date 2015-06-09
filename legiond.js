@@ -23,6 +23,7 @@ function LegionD(options){
     this.options = _.defaults(options, {
         network: {},
         heartbeat_interval: 15000,
+        discovery_interval: 60000,
         node_timeout: 60000,
         attributes: {}
     });
@@ -52,6 +53,12 @@ function LegionD(options){
 
         var cidr = self.options.network.cidr;
         self.actions.discover_peers(cidr);
+
+        if(self.options.discovery_interval > 0){
+            setInterval(function(){
+                self.actions.discover_peers(cidr);
+            }, self.options.discovery_interval);
+        }
     });
 
     this.network.on("message", function(msg){
