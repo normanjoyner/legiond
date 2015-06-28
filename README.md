@@ -7,7 +7,7 @@ legiond
 Legiond is a secure distributed event layer for nodejs applications. Given a CIDR range, it automatically finds and connects to peers, forming a clustered EventEmitter. Legiond exposes a standard set of events which can be listened for, such as addition of a new node, removal of an existing node, etc. It also allows an application to register custom events and respond to them how it sees fit. More detail about custom events can be found below.
 
 ###Author
-* Norman Joyner - <norman.joyner@gmail.com>
+ContainerShip Developers - developers@containership.io
 
 ##Getting Started
 
