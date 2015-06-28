@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Norman Joyner <norman.joyner@gmail.com>",
+  "author": "ContainerShip Developers <developers@containership.io>",
   "dependencies": {
     "async": "^0.9.0",
     "eventemitter2": "^0.4.13",
@@ -32,7 +32,7 @@
     "eventemitter",
     "layer"
   ],
-  "license": "GPLv2",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/containership/legiond/issues"
   },
