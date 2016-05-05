@@ -1,6 +1,6 @@
 {
   "name": "legiond",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "dependencies": {
     "async": {
       "version": "0.9.2",
@@ -22,15 +22,15 @@
           "from": "bun@0.0.10",
           "resolved": "https://registry.npmjs.org/bun/-/bun-0.0.10.tgz"
         },
-        "tstream": {
-          "version": "0.0.1",
-          "from": "git://github.com/jasonkuhrt/tstream.git",
-          "resolved": "git://github.com/jasonkuhrt/tstream.git#4f51e59ab9bb168e43f724df8b5d027235a6def4"
-        },
         "delimit-stream": {
           "version": "0.0.1",
           "from": "delimit-stream@0.0.1",
           "resolved": "https://registry.npmjs.org/delimit-stream/-/delimit-stream-0.0.1.tgz"
+        },
+        "tstream": {
+          "version": "0.0.1",
+          "from": "git://github.com/jasonkuhrt/tstream.git",
+          "resolved": "git://github.com/jasonkuhrt/tstream.git#4f51e59ab9bb168e43f724df8b5d027235a6def4"
         }
       }
     },
@@ -70,6 +70,16 @@
           "version": "0.0.7",
           "from": "wmic@>=0.0.7 <0.0.8",
           "resolved": "https://registry.npmjs.org/wmic/-/wmic-0.0.7.tgz"
+        },
+        "async": {
+          "version": "2.0.0-rc.3",
+          "from": "async@latest",
+          "resolved": "https://registry.npmjs.org/async/-/async-2.0.0-rc.3.tgz"
+        },
+        "lodash": {
+          "version": "4.11.2",
+          "from": "lodash@>=4.3.0 <5.0.0",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.11.2.tgz"
         }
       }
     },
