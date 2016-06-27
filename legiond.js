@@ -1,17 +1,17 @@
-var _ = require("lodash");
-var Network = require([__dirname, "lib", "network"].join("/"));
-var EventEmitter = require("eventemitter2").EventEmitter2;
-var heartbeat = require([__dirname, "lib", "heartbeat"].join("/"));
+var _ = require('lodash');
+var Network = require([__dirname, 'lib', 'network'].join('/'));
+var EventEmitter = require('eventemitter2').EventEmitter2;
+var heartbeat = require([__dirname, 'lib', 'heartbeat'].join('/'));
 
 function LegionD(options){
     var self = this;
     EventEmitter.call(this);
 
     var required_libs = [
-        "heartbeat",
-        "node",
-        "nodes",
-        "discovery"
+        'heartbeat',
+        'node',
+        'nodes',
+        'discovery'
     ]
 
     this.events = {};
@@ -31,8 +31,8 @@ function LegionD(options){
     this.libraries = {};
 
     _.each(required_libs, function(lib){
-        var library_name = lib.split(".")[0];
-        this.libraries[library_name] = require([__dirname, "lib", lib].join("/"))(this);
+        var library_name = lib.split('.')[0];
+        this.libraries[library_name] = require([__dirname, 'lib', lib].join('/'))(this);
     }, this);
 
 
@@ -49,7 +49,7 @@ function LegionD(options){
 
         self.actions.start_heartbeat();
 
-        self.emit("listening");
+        self.emit('listening');
 
         var cidr = self.options.network.cidr;
         self.actions.discover_peers(cidr);
@@ -61,7 +61,7 @@ function LegionD(options){
         }
     });
 
-    this.network.on("message", function(msg){
+    this.network.on('message', function(msg){
         if(_.has(self.events, msg.event)){
             var json = {
                 author: self.libraries.nodes.list[msg.id],
@@ -72,8 +72,8 @@ function LegionD(options){
         }
     });
 
-    this.network.on("error", function(err){
-        self.emit("error", err);
+    this.network.on('error', function(err){
+        self.emit('error', err);
     });
 }
 
@@ -96,9 +96,9 @@ LegionD.prototype.join = function(event){
     var self = this;
 
     var reserved_commands = [
-        "listening",
-        "node_added",
-        "node_removed"
+        'listening',
+        'node_added',
+        'node_removed'
     ]
 
     if(!_.contains(reserved_commands, event)){
@@ -141,11 +141,11 @@ LegionD.prototype.get_attributes = function(){
 }
 
 LegionD.prototype.set_attributes = function(attributes){
-    attributes = _.omit(attributes, ["id", "host_name", "address", "port"]);
+    attributes = _.omit(attributes, ['id', 'host_name', 'address', 'port']);
     _.defaults(attributes, this.libraries.node.attributes);
     this.libraries.node.attributes = attributes;
     this.send({
-        event: "legiond.node_updated",
+        event: 'legiond.node_updated',
         data: attributes
     });
 }
