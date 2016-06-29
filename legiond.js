@@ -1,7 +1,6 @@
 'use strict';
 
 const Network = require('./lib/network');
-const heartbeat = require('./lib/heartbeat');
 
 const _ = require('lodash');
 const EventEmitter = require('eventemitter2').EventEmitter2;
@@ -11,11 +10,11 @@ const REQUIRED_LIBS = [
     'node',
     'nodes',
     'discovery'
-]
+];
 
 class LegionD extends EventEmitter {
     constructor(options) {
-        super()
+        super();
 
         this.events = {};
         this.actions = {};
@@ -45,7 +44,7 @@ class LegionD extends EventEmitter {
             this.libraries.node.attributes.address = {
                 private: this.options.network.address.private,
                 public: this.options.network.address.public
-            }
+            };
 
             this.actions.start_heartbeat();
 
@@ -67,7 +66,7 @@ class LegionD extends EventEmitter {
                     author: this.libraries.nodes.list[msg.id],
                     data: msg.data,
                     stream: msg.stream
-                }
+                };
 
                 this.events[msg.event](json);
             }
@@ -81,7 +80,7 @@ class LegionD extends EventEmitter {
      * pubkey & prime number before returning the node attributes
      */
     get_peers() {
-        return _.map(this.libraries.nodes.list, (node, name) => {
+        return _.map(this.libraries.nodes.list, (node/*, name*/) => {
             this.clean_data(node);
 
             return node;
@@ -102,12 +101,12 @@ class LegionD extends EventEmitter {
             'listening',
             'node_added',
             'node_removed'
-        ]
+        ];
 
         if(!_.contains(RESERVED_COMMANDS, event)) {
             this.events[event] = (data) => {
                 self.emit(event, data);
-            }
+            };
         }
     }
 

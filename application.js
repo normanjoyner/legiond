@@ -8,4 +8,4 @@ module.exports = function(options) {
     legiond.version = pkg.version;
 
     return legiond;
-}
+};
