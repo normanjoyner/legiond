@@ -76,6 +76,10 @@ class LegionD extends EventEmitter {
         this.network.on('error', err => this.emit('error', err));
     }
 
+    /*
+     * Retrieve all the known peers connected to the cluster. Strip
+     * pubkey & prime number before returning the node attributes
+     */
     get_peers() {
         return _.map(this.libraries.nodes.list, (node, name) => {
             this.clean_data(node);
@@ -84,6 +88,13 @@ class LegionD extends EventEmitter {
         });
     }
 
+    /*
+     * If it is not a reserved command, register the inside legiond to
+     * enable emitting across the cluster for the given event.
+     *
+     * @param {string} event - The event to be registered to the legiond
+     * emitter
+     */
     join(event) {
         const self = this;
 
@@ -100,10 +111,25 @@ class LegionD extends EventEmitter {
         }
     }
 
+    /*
+     * Remove the given event from the legiond event emitter
+     *
+     * @param {string} event - The event to be unregistered from
+     * the legiond emitter
+     */
     leave(event) {
         delete this.events[event];
     }
 
+    /*
+     * Send an event to the targets provided or to all peers
+     * in the cluster if no target was provided
+     *
+     * @param {Object} json - The json object to send over the network
+     * @param {string|array[string]} targets - The targets to send the event to
+     * @param {callback} fn - Callback to trigger once the event has been sent
+     * across the network
+     */
     send(json, targets, fn) {
         if(_.isFunction(targets)) {
             fn = targets;
