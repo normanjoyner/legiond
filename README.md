@@ -1,17 +1,19 @@
-legiond
-======
+# legiond
 
-##About
+## About
 
-###Description
+### Build Status
+[![Build Status](https://drone.containership.io/api/badges/containership/legiond/status.svg)](https://drone.containership.io/containership/legiond)
+
+### Description
 Legiond is a secure distributed event layer for nodejs applications. Given a CIDR range, it automatically finds and connects to peers, forming a clustered EventEmitter. Legiond exposes a standard set of events which can be listened for, such as addition of a new node, removal of an existing node, etc. It also allows an application to register custom events and respond to them how it sees fit. More detail about custom events can be found below.
 
-###Author
+### Author
 ContainerShip Developers - developers@containership.io
 
-##Getting Started
+## Getting Started
 
-###Installation
+### Installation
 ```npm install legiond```
 
 ###Configuration
@@ -43,5 +45,5 @@ var legiond = new LegionD({
 });
 ```
 
-###Encryption
+### Encryption
 Once a node is connected to the cluster, legiond encrypts all traffic using 128-bit aes-gcm authenticated encryption. The aes key used for each pair of nodes is unique, and is generated using Diffie-Hellman key exchange upon initial connection. Initialization vectors are never reused. Since legiond does not require a pre-shared key to perform encryption, there is no fear of having that key compromised. Additionally, key rotation is made easy by simply restarting the node.
