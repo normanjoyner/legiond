@@ -1,5 +1,5 @@
 {
-  "name": "@containership/legiond",
+  "name": "legiond",
   "version": "1.2.5",
   "description": "A secure distributed event layer for nodejs applications",
   "main": "application.js",
