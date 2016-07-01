@@ -1,6 +1,6 @@
 {
   "name": "@containership/legiond",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A secure distributed event layer for nodejs applications",
   "main": "application.js",
   "scripts": {
