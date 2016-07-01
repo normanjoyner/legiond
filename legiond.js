@@ -1,165 +1,183 @@
-var _ = require('lodash');
-var Network = require([__dirname, 'lib', 'network'].join('/'));
-var EventEmitter = require('eventemitter2').EventEmitter2;
-var heartbeat = require([__dirname, 'lib', 'heartbeat'].join('/'));
+'use strict';
 
-function LegionD(options){
-    var self = this;
-    EventEmitter.call(this);
+const Network = require('./lib/network');
 
-    var required_libs = [
-        'heartbeat',
-        'node',
-        'nodes',
-        'discovery'
-    ]
+const _ = require('lodash');
+const EventEmitter = require('eventemitter2').EventEmitter2;
 
-    this.events = {};
-    this.actions = {};
+const REQUIRED_LIBS = [
+    'heartbeat',
+    'node',
+    'nodes',
+    'discovery'
+];
 
-    if(_.isUndefined(options))
-        options = {};
+class LegionD extends EventEmitter {
+    constructor(options) {
+        super();
 
-    this.options = _.defaults(options, {
-        network: {},
-        heartbeat_interval: 15000,
-        discovery_interval: 60000,
-        node_timeout: 60000,
-        attributes: {}
-    });
+        this.events = {};
+        this.actions = {};
 
-    this.libraries = {};
+        this.options = options || {};
+        this.options = _.defaults(options, {
+            network: {},
+            heartbeat_interval: 15000,
+            discovery_interval: 60000,
+            node_timeout: 60000,
+            attributes: {}
+        });
 
-    _.each(required_libs, function(lib){
-        var library_name = lib.split('.')[0];
-        this.libraries[library_name] = require([__dirname, 'lib', lib].join('/'))(this);
-    }, this);
+        this.libraries = {};
+        this.libraries = _.reduce(REQUIRED_LIBS, (result, libname) => {
+            result[libname] = require(`./lib/${libname}`)(this);
 
+            return result;
+        }, {});
 
-    this.libraries.node.attributes = this.options.attributes;
+        this.libraries.node.attributes = this.options.attributes;
 
-    this.network = new Network(this.options.network, function(){
-        self.libraries.node.attributes.id = self.options.network.id;
-        self.libraries.node.attributes.port = self.options.network.port;
-        self.libraries.node.attributes.host_name =  self.options.network.address.host_name;
-        self.libraries.node.attributes.address = {
-            private: self.options.network.address.private,
-            public: self.options.network.address.public
-        }
+        this.network = new Network(this.options.network, () => {
+            this.libraries.node.attributes.id = this.options.network.id;
+            this.libraries.node.attributes.port = this.options.network.port;
+            this.libraries.node.attributes.host_name =  this.options.network.address.host_name;
+            this.libraries.node.attributes.address = {
+                private: this.options.network.address.private,
+                public: this.options.network.address.public
+            };
 
-        self.actions.start_heartbeat();
+            this.actions.start_heartbeat();
 
-        self.emit('listening');
+            this.emit('listening');
 
-        var cidr = self.options.network.cidr;
-        self.actions.discover_peers(cidr);
+            const cidr = this.options.network.cidr;
+            this.actions.discover_peers(cidr);
 
-        if(self.options.discovery_interval > 0){
-            setInterval(function(){
-                self.actions.discover_peers(cidr);
-            }, self.options.discovery_interval);
-        }
-    });
-
-    this.network.on('message', function(msg){
-        if(_.has(self.events, msg.event)){
-            var json = {
-                author: self.libraries.nodes.list[msg.id],
-                data: msg.data,
-                stream: msg.stream
+            if(this.options.discovery_interval > 0){
+                setInterval(() => {
+                    this.actions.discover_peers(cidr);
+                }, this.options.discovery_interval);
             }
-            self.events[msg.event](json);
-        }
-    });
+        });
 
-    this.network.on('error', function(err){
-        self.emit('error', err);
-    });
-}
+        this.network.on('message', (msg) => {
+            if(_.has(this.events, msg.event)) {
+                const json = {
+                    author: this.libraries.nodes.list[msg.id],
+                    data: msg.data,
+                    stream: msg.stream
+                };
 
-LegionD.super_ = EventEmitter;
-LegionD.prototype = Object.create(EventEmitter.prototype, {
-    constructor: {
-        value: LegionD,
-        enumerable: false
+                this.events[msg.event](json);
+            }
+        });
+
+        this.network.on('error', err => this.emit('error', err));
     }
-});
 
-LegionD.prototype.get_peers = function(){
-    return _.map(this.libraries.nodes.list, function(node, name){
-        this.clean_data(node);
-        return node;
-    }, this);
-}
+    /*
+     * Retrieve all the known peers connected to the cluster. Strip
+     * pubkey & prime number before returning the node attributes
+     */
+    get_peers() {
+        return _.map(this.libraries.nodes.list, (node/*, name*/) => {
+            this.clean_data(node);
 
-LegionD.prototype.join = function(event){
-    var self = this;
+            return node;
+        });
+    }
 
-    var reserved_commands = [
-        'listening',
-        'node_added',
-        'node_removed'
-    ]
+    /*
+     * If it is not a reserved command, register the inside legiond to
+     * enable emitting across the cluster for the given event.
+     *
+     * @param {string} event - The event to be registered to the legiond
+     * emitter
+     */
+    join(event) {
+        const self = this;
 
-    if(!_.contains(reserved_commands, event)){
-        this.events[event] = function(data){
-            self.emit(event, data);
+        const RESERVED_COMMANDS = [
+            'listening',
+            'node_added',
+            'node_removed'
+        ];
+
+        if(!_.contains(RESERVED_COMMANDS, event)) {
+            this.events[event] = (data) => {
+                self.emit(event, data);
+            };
         }
     }
-}
 
-LegionD.prototype.leave = function(event){
-    if(_.has(this.events, event))
+    /*
+     * Remove the given event from the legiond event emitter
+     *
+     * @param {string} event - The event to be unregistered from
+     * the legiond emitter
+     */
+    leave(event) {
         delete this.events[event];
-}
-
-LegionD.prototype.send = function(json, targets, fn){
-    if(_.isFunction(targets)){
-        fn = targets;
-        targets = _.values(this.libraries.nodes.list);
     }
-    else if(_.isUndefined(targets))
-        targets = _.values(this.libraries.nodes.list);
-    else if(!_.isArray(targets))
-        var targets = [targets];
 
-    if(_.isUndefined(json.data))
-        json.data = {};
+    /*
+     * Send an event to the targets provided or to all peers
+     * in the cluster if no target was provided
+     *
+     * @param {Object} json - The json object to send over the network
+     * @param {string|array[string]} targets - The targets to send the event to
+     * @param {callback} fn - Callback to trigger once the event has been sent
+     * across the network
+     */
+    send(json, targets, fn) {
+        if(_.isFunction(targets)) {
+            fn = targets;
+            targets = _.values(this.libraries.nodes.list);
+        } else if(_.isUndefined(targets)) {
+            targets = _.values(this.libraries.nodes.list);
+        } else if(!_.isArray(targets)) {
+            targets = [targets];
+        }
 
-    this.network.send(json, targets, fn);
-}
+        json.data = json.data || {};
+        this.network.send(json, targets, fn);
+    }
 
-LegionD.prototype.clean_data = function(data){
-    delete data.pubkey;
-    delete data.prime;
-}
+    clean_data(data) {
+        delete data.pubkey;
+        delete data.prime;
+    }
 
-LegionD.prototype.get_attributes = function(){
-    var attributes = _.cloneDeep(this.libraries.node.attributes);
-    this.clean_data(attributes);
-    return attributes;
-}
+    get_attributes() {
+        const attributes = _.cloneDeep(this.libraries.node.attributes);
+        this.clean_data(attributes);
 
-LegionD.prototype.set_attributes = function(attributes){
-    attributes = _.omit(attributes, ['id', 'host_name', 'address', 'port']);
-    _.defaults(attributes, this.libraries.node.attributes);
-    this.libraries.node.attributes = attributes;
-    this.send({
-        event: 'legiond.node_updated',
-        data: attributes
-    });
-}
+        return attributes;
+    }
 
-LegionD.prototype.exit = function(fn){
-    var self = this;
-    this.actions.exit(function(){
-        self.actions.stop_heartbeat();
-        self.removeAllListeners();
-        self.network.destroy();
-        self.libraries.heartbeat.cache.purge();
-        if(!_.isUndefined(fn))
-            return fn();
-    });
+    set_attributes(attributes) {
+        attributes = _.omit(attributes, ['id', 'host_name', 'address', 'port']);
+        _.defaults(attributes, this.libraries.node.attributes);
+        this.libraries.node.attributes = attributes;
+
+        this.send({
+            event: 'legiond.node_updated',
+            data: attributes
+        });
+    }
+
+    exit(fn) {
+        this.actions.exit(() => {
+            this.actions.stop_heartbeat();
+            this.removeAllListeners();
+            this.network.destroy();
+            this.libraries.heartbeat.cache.purge();
+
+            if(!_.isUndefined(fn)) {
+                return fn();
+            }
+        });
+    }
 }
 
 module.exports = LegionD;
