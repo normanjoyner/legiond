@@ -1,6 +1,6 @@
 {
   "name": "legiond",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "dependencies": {
     "async": {
       "version": "0.9.2",
