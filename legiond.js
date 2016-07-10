@@ -63,7 +63,7 @@ class LegionD extends EventEmitter {
         this.network.on('message', (msg) => {
             if(_.has(this.events, msg.event)) {
                 const json = {
-                    author: this.libraries.nodes.list[msg.id],
+                    author: this.clean_data(this.libraries.nodes.list[msg.id]),
                     data: msg.data,
                     stream: msg.stream
                 };
@@ -81,9 +81,7 @@ class LegionD extends EventEmitter {
      */
     get_peers() {
         return _.map(this.libraries.nodes.list, (node/*, name*/) => {
-            this.clean_data(node);
-
-            return node;
+            return this.clean_data(node);
         });
     }
 
@@ -144,8 +142,7 @@ class LegionD extends EventEmitter {
     }
 
     clean_data(data) {
-        delete data.pubkey;
-        delete data.prime;
+        return _.omit(data, ['prime', 'pubkey']);
     }
 
     get_attributes() {
