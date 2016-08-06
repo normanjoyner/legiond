@@ -50,12 +50,11 @@ class LegionD extends EventEmitter {
 
             this.emit('listening');
 
-            const cidr = this.options.network.cidr;
-            this.actions.discover_peers(cidr);
+            this.actions.discover_peers(this.options.network.cidr);
 
             if(this.options.discovery_interval > 0){
                 setInterval(() => {
-                    this.actions.discover_peers(cidr);
+                    this.actions.discover_peers(this.options.network.cidr);
                 }, this.options.discovery_interval);
             }
         });
