@@ -1033,11 +1033,6 @@
       "from": "network@>=0.1.3 <0.2.0",
       "resolved": "https://registry.npmjs.org/network/-/network-0.1.3.tgz",
       "dependencies": {
-        "async": {
-          "version": "2.0.0-rc.3",
-          "from": "async@latest",
-          "resolved": "https://registry.npmjs.org/async/-/async-2.0.0-rc.3.tgz"
-        },
         "lodash": {
           "version": "4.11.2",
           "from": "lodash@>=4.3.0 <5.0.0",
@@ -1058,7 +1053,14 @@
         "wmic": {
           "version": "0.0.7",
           "from": "wmic@>=0.0.7 <0.0.8",
-          "resolved": "https://registry.npmjs.org/wmic/-/wmic-0.0.7.tgz"
+          "resolved": "https://registry.npmjs.org/wmic/-/wmic-0.0.7.tgz",
+          "dependencies": {
+            "async": {
+              "version": "2.0.1",
+              "from": "async@latest",
+              "resolved": "https://registry.npmjs.org/async/-/async-2.0.1.tgz"
+            }
+          }
         }
       }
     },
