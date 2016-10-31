@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const mkdirp = require('mkdirp')
+const mkdirp = require('mkdirp');
 const _ = require('lodash');
 const EventEmitter = require('eventemitter2').EventEmitter2;
 const Network = require('./lib/network');
@@ -26,7 +26,7 @@ class LegionD extends EventEmitter {
             heartbeat_interval: 15000,
             discovery_interval: 60000,
             node_timeout: 60000,
-            attributes_snapshot_dir: "/opt/containership/legiond",
+            attributes_snapshot_dir: '/opt/containership/legiond',
             attributes: {}
         });
 
@@ -169,20 +169,17 @@ class LegionD extends EventEmitter {
     }
 
     restore_attributes() {
-        fs.readFile(this.options.attributes_snapshot_dir + "/attributes.snapshot", 'utf-8', (err, data) => {
+        fs.readFile(this.options.attributes_snapshot_dir + '/attributes.snapshot', 'utf-8', (err, data) => {
             if(err) {
-                console.error("Error restoring LegionD attributes from snapshot.");
-                this.emit('error', e);
+                this.emit('error', err);
             } else {
                 this.set_attributes(JSON.parse(data));
-                console.log("LegionD attributes restored from snapshot successfully.");
             }
         });
     }
 
     save_attributes() {
         const onError = (e) => {
-            console.error("Error saving LegionD attributes on node: " + e);
             this.emit('error', e);
         };
 
@@ -190,7 +187,7 @@ class LegionD extends EventEmitter {
             if(err) {
                 onError(err);
             } else {
-                fs.writeFile(this.options.attributes_snapshot_dir + "/attributes.snapshot",
+                fs.writeFile(this.options.attributes_snapshot_dir + '/attributes.snapshot',
                         JSON.stringify(this.get_attributes()), (err) => {
                             if(err) onError(err);
                         });
