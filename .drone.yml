@@ -1,5 +1,5 @@
 build:
-  image: library/node:6.2.2
+  image: library/node:6.9.1
   commands:
     - npm install
     - npm run lint
