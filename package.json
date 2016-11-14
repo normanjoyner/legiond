@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "eslint": "^2.13.1",
-    "mocha": "https://registry.npmjs.org/mocha/-/mocha-2.5.3.tgz"
+    "mocha": "^2.5.3"
   },
   "repository": {
     "type": "git",
