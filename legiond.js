@@ -33,7 +33,6 @@ class LegionD extends EventEmitter {
         this.libraries = {};
         this.libraries = _.reduce(REQUIRED_LIBS, (result, libname) => {
             result[libname] = require(`./lib/${libname}`)(this);
-
             return result;
         }, {});
 
@@ -155,7 +154,7 @@ class LegionD extends EventEmitter {
         return attributes;
     }
 
-    set_attributes(attributes) {
+    set_attributes(attributes, callback) {
         attributes = _.omit(attributes, ['id', 'host_name', 'address', 'port']);
         _.defaults(attributes, this.libraries.node.attributes);
         this.libraries.node.attributes = attributes;
@@ -165,32 +164,40 @@ class LegionD extends EventEmitter {
             data: attributes
         });
 
-        this.save_attributes();
+        this.save_attributes(callback);
     }
 
-    restore_attributes() {
+    restore_attributes(callback) {
         fs.readFile(this.options.attributes_snapshot_dir + '/attributes.snapshot', 'utf-8', (err, data) => {
-            if(err) {
+            if(err && err.code !== 'ENOENT') {
                 this.emit('error', err);
+            } else if(err && err.code === 'ENOENT') {
+                this.set_attributes(this.get_attributes(), callback);
             } else {
-                this.set_attributes(JSON.parse(data));
+                this.set_attributes(_.defaults(this.get_attributes(), JSON.parse(data)), callback);
             }
         });
     }
 
-    save_attributes() {
+    save_attributes(callback) {
         const onError = (e) => {
             this.emit('error', e);
+            if(callback) {
+                return callback(e);
+            }
         };
 
         mkdirp(this.options.attributes_snapshot_dir, (err) => {
             if(err) {
                 onError(err);
             } else {
-                fs.writeFile(this.options.attributes_snapshot_dir + '/attributes.snapshot',
-                        JSON.stringify(this.get_attributes()), (err) => {
-                            if(err) onError(err);
-                        });
+                fs.writeFile(this.options.attributes_snapshot_dir + '/attributes.snapshot', JSON.stringify(this.get_attributes()), (err) => {
+                    if(err) {
+                        onError(err);
+                    } else if(callback) {
+                        return callback();
+                    }
+                });
             }
         });
     }
