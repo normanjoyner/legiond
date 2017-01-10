@@ -103,7 +103,7 @@ class LegionD extends EventEmitter {
             'node_removed'
         ];
 
-        if(!_.contains(RESERVED_COMMANDS, event)) {
+        if(!_.includes(RESERVED_COMMANDS, event)) {
             this.events[event] = (data) => {
                 self.emit(event, data);
             };
@@ -174,7 +174,7 @@ class LegionD extends EventEmitter {
             } else if(err && err.code === 'ENOENT') {
                 this.set_attributes(this.get_attributes(), callback);
             } else {
-                this.set_attributes(_.defaults(this.get_attributes(), JSON.parse(data)), callback);
+                this.set_attributes(_.defaultsDeep(this.get_attributes(), JSON.parse(data)), callback);
             }
         });
     }
