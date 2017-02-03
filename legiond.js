@@ -140,7 +140,22 @@ class LegionD extends EventEmitter {
         }
 
         json.data = json.data || {};
-        this.network.send(json, targets, fn);
+
+        // removes self from target list and directly executes event handler. Note: _.remove mutates the original
+        // array so we can safely call network.send with the remaining targets
+        const selfTarget = _.remove(targets, target => target.id === this.libraries.node.attributes.id).length === 1;
+
+        // execute message handler
+        if (selfTarget && _.has(this.events, json.event)) {
+            const selfJson = _.cloneDeep(json);
+            selfJson.author = this.get_attributes();
+            this.events[selfJson.event](selfJson);
+        }
+
+        // send out message to remaining targets
+        if (targets.length > 0) {
+            this.network.send(json, targets, fn);
+        }
     }
 
     clean_data(data) {
