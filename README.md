@@ -34,13 +34,17 @@ Custom user events can be registered and listened for like any standard event. T
 ##Security
 
 ###Gatekeeper
-By default, any node running legiond can connect to an existing legiond cluster. Since this may not be desirable, filters can be enforced which require a connecting node to meet certain criteria, before being added to the cluster. When configuring your node, simply pass legiond a `gatekeeper` function. The `gatekeeper` function takes two parameters, the node object and a callback, which should be executed, returning a boolean value. If the callback returns true, the node is added to the cluster, otherwise it is rejected. For example, the following filter will only accept nodes if their hostname ends with "org.internal":
+By default, any node running legiond can connect to an existing legiond cluster. Since this may not be desirable, filters can be enforced which require a connecting node to meet certain criteria, before being added to the cluster. When configuring your node, simply pass legiond a `gatekeeper` function. The `gatekeeper` function takes two parameters, the node object and a callback, which should be executed, returning an error if applicable. If the callback returns an error, the node is unable to join the cluster, otherwise it is accepted. For example, the following filter will only accept nodes if their hostname ends with "org.internal":
 
 ```javascript
-var LegionD = require("legiond");
-var legiond = new LegionD({
-    gatekeeper: function(data, fn){
-        return fn(data.host.match(/org.internal$/g) != null);
+const LegionD = require('legiond');
+const legiond = new LegionD({
+    gatekeeper: (data, callback) => {
+        if(data.host.match(/org.internal$/g) === null) {
+            return callback(new Error(`Rejected connection! ${data.id} has invalid hostname`));
+        } else {
+            return callback();
+        }
     }
 });
 ```
