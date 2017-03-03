@@ -162,6 +162,18 @@ class LegionD extends EventEmitter {
         return _.omit(data, ['prime', 'pubkey']);
     }
 
+    get_gatekeepers() {
+        return this.libraries.node.get_gatekeepers();
+    }
+
+    add_gatekeeper(gatekeeper) {
+        this.libraries.node.add_gatekeeper(gatekeeper);
+    }
+
+    remove_gatekeeper(gatekeeper) {
+        this.libraries.node.remove_gatekeeper(gatekeeper);
+    }
+
     get_attributes() {
         const attributes = _.cloneDeep(this.libraries.node.attributes);
         this.clean_data(attributes);
