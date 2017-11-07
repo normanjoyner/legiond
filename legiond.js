@@ -155,6 +155,8 @@ class LegionD extends EventEmitter {
         // send out message to remaining targets
         if (targets.length > 0) {
             this.network.send(json, targets, fn);
+        } else if(_.isFunction(fn)) {
+            return fn();
         }
     }
 
